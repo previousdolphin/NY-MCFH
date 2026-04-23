@@ -157,12 +157,18 @@
             </div>
 
             <div class="bg-white border-4 border-brand-black shadow-brutal flex flex-col lg:flex-row overflow-hidden">
-                <!-- Poster Image -->
-                <div class="w-full lg:w-1/2 border-b-4 lg:border-b-0 lg:border-r-4 border-brand-black bg-brand-cream">
-                    <img src="Mayday_2026_Poster.png" 
-                         onerror="this.src='https://placehold.co/800x1000/f4f4f0/111111?text=May+Day+2026+Poster'" 
-                         alt="Hands Off Higher Ed - May Day 2026" 
-                         class="w-full h-full object-cover">
+                <!-- Poster Image (Hover to flip) -->
+                <div class="w-full lg:w-1/2 border-b-4 lg:border-b-0 lg:border-r-4 border-brand-black bg-brand-cream relative group cursor-pointer" tabindex="0">
+                    <!-- Front Image -->
+                    <img src="may-day-front.jpg" 
+                         onerror="this.src='https://placehold.co/800x1000/f4f4f0/111111?text=May+Day+2026+Front'" 
+                         alt="Hands Off Higher Ed - May Day 2026 Front" 
+                         class="w-full h-full object-cover absolute inset-0 z-10 transition-opacity duration-500 ease-in-out group-hover:opacity-0 group-focus:opacity-0">
+                    <!-- Back Image -->
+                    <img src="may-day-back.jpg" 
+                         onerror="this.src='https://placehold.co/800x1000/f4f4f0/111111?text=May+Day+2026+Back'" 
+                         alt="Hands Off Higher Ed - May Day 2026 Back" 
+                         class="w-full h-full object-cover relative z-0">
                 </div>
                 
                 <!-- Event Details -->

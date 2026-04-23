@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NY Metro Coalition for Higher Education</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Oswald:wght@500;700&family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#cc191c',
+                            green: '#2d6a4f',
+                            black: '#111111',
+                            cream: '#f4f4f0',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Oswald', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    boxShadow: {
+                        'brutal': '6px 6px 0px 0px rgba(17, 17, 17, 1)',
+                        'brutal-hover': '2px 2px 0px 0px rgba(17, 17, 17, 1)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        /* Custom fallback style for missing logos in Who We Are section */
+        .logo-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border: 4px solid #111;
+            font-family: 'Oswald', sans-serif;
+            font-weight: bold;
+            font-size: 1.1rem;
+            line-height: 1.2;
+            color: #111;
+            box-shadow: 4px 4px 0px 0px rgba(17,17,17,1);
+            aspect-ratio: 1 / 1;
+        }
+    </style>
+</head>
+<body class="bg-brand-cream text-brand-black font-sans antialiased selection:bg-brand-red selection:text-white">
+
+    <!-- News Ticker / Alert Bar -->
+    <a href="#actions" class="block bg-brand-black text-white font-display text-sm tracking-widest uppercase border-b-4 border-brand-red marquee-container py-2 relative z-[80] hover:bg-gray-900 transition-colors cursor-pointer">
+        <div class="marquee-content">
+            DEFEND THE RIGHT TO LEARN • HANDS OFF HIGHER ED • PROTECT ACADEMIC FREEDOM • DEFEND THE RIGHT TO LEARN • HANDS OFF HIGHER ED • PROTECT ACADEMIC FREEDOM • DEFEND THE RIGHT TO LEARN • HANDS OFF HIGHER ED • PROTECT ACADEMIC FREEDOM • 
+        </div>
+    </a>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-brand-cream border-b-4 border-brand-black relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-40">
+            <div class="flex justify-between h-20 items-center">
+                
+                <!-- Logo & Brand Name -->
+                <a href="#" class="flex items-center group relative h-full">
+                    <div class="relative z-[60] -mb-12 sm:-mb-16 mr-3 sm:mr-4 border-4 border-brand-black bg-brand-cream p-1 shadow-brutal transition-transform group-hover:translate-y-1 group-hover:shadow-brutal-hover">
+                        <img src="NY Metro CHE Logo trans.png" 
+                             onerror="this.src='https://placehold.co/100x100/cc191c/ffffff?text=LOGO'" 
+                             alt="NY Metro Coalition Logo" 
+                             class="h-16 sm:h-28 w-auto object-contain">
+                    </div>
+                    <span class="font-display font-bold text-lg sm:text-xl uppercase leading-none block tracking-wide">
+                        NY Metro Coalition<br>
+                        <span class="text-brand-red text-sm sm:text-base">For Higher Ed</span>
+                    </span>
+                </a>
+                
+                <!-- Desktop Links -->
+                <div class="hidden lg:flex space-x-6 items-center">
+                    <a href="#actions" class="font-display font-bold text-lg uppercase tracking-wide hover:text-brand-red transition-colors">Actions</a>
+                    <a href="#who-we-are" class="font-display font-bold text-lg uppercase tracking-wide hover:text-brand-red transition-colors">Who We Are</a>
+                    <a href="#mission" class="font-display font-bold text-lg uppercase tracking-wide hover:text-brand-red transition-colors">Mission</a>
+                    <a href="#get-involved" class="bg-brand-red text-white font-display font-bold text-lg uppercase tracking-wider px-6 py-2 border-2 border-brand-black shadow-brutal hover:translate-y-1 hover:shadow-brutal-hover transition-all">Get Involved</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="lg:hidden flex items-center relative z-[70]">
+                    <button id="mobile-menu-btn" class="text-brand-black focus:outline-none p-2 border-2 border-brand-black shadow-[2px_2px_0_0_#111] bg-white hover:bg-gray-100 transition-colors">
+                        <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Absolute to break over the logo on the z-axis) -->
+        <div id="mobile-menu" class="hidden lg:hidden absolute top-full left-0 w-full bg-brand-cream border-b-4 border-brand-black z-[70] shadow-2xl flex flex-col">
+            <a href="#actions" class="block px-6 py-4 font-display font-bold text-xl uppercase border-t-2 border-brand-black hover:bg-brand-red hover:text-white bg-brand-cream transition-colors">Actions</a>
+            <a href="#who-we-are" class="block px-6 py-4 font-display font-bold text-xl uppercase border-t-2 border-brand-black hover:bg-brand-red hover:text-white bg-brand-cream transition-colors">Who We Are</a>
+            <a href="#mission" class="block px-6 py-4 font-display font-bold text-xl uppercase border-t-2 border-brand-black hover:bg-brand-red hover:text-white bg-brand-cream transition-colors">Mission</a>
+            <a href="#get-involved" class="block px-6 py-4 font-display font-bold text-xl uppercase bg-brand-red text-white border-t-2 border-brand-black hover:bg-brand-black transition-colors">Get Involved</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="border-b-4 border-brand-black bg-white overflow-hidden relative">
+        <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(#111 2px, transparent 2px); background-size: 30px 30px;"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 lg:pt-32 lg:pb-32 relative z-10 flex flex-col md:flex-row items-center gap-12">
+            <div class="flex-1 text-left">
+                <div class="inline-block bg-brand-green text-white font-display font-bold uppercase px-3 py-1 mb-6 border-2 border-brand-black transform -rotate-2 mt-4 sm:mt-0">
+                    Grassroots Power
+                </div>
+                <h1 class="text-6xl md:text-8xl font-display font-bold uppercase tracking-tighter leading-[0.9] mb-6">
+                    DEFEND THE<br>
+                    <span class="text-white" style="text-shadow: 4px 4px 0 #cc191c, -1px -1px 0 #111, 1px -1px 0 #111, -1px 1px 0 #111, 1px 1px 0 #111;">RIGHT TO LEARN</span>
+                </h1>
+                <p class="mt-4 text-xl md:text-2xl font-semibold max-w-2xl text-brand-black border-l-4 border-brand-red pl-4">
+                    A united network of faculty, staff unions, and advocacy groups fighting for academic freedom and economic equity in the NYC Metro.
+                </p>
+                
+                <!-- Updated Hero Buttons -->
+                <div class="mt-10 flex flex-wrap gap-4">
+                    <a href="#who-we-are" class="bg-brand-red text-white font-display font-bold uppercase tracking-wider px-8 py-4 border-2 border-brand-black shadow-brutal hover:translate-y-1 hover:shadow-brutal-hover transition-all text-lg">
+                        Who We Are
+                    </a>
+                    <a href="#mission" class="bg-brand-black text-white font-display font-bold uppercase tracking-wider px-8 py-4 border-2 border-brand-black shadow-brutal hover:translate-y-1 hover:shadow-brutal-hover transition-all text-lg">
+                        Mission
+                    </a>
+                    <a href="#actions" class="bg-white text-brand-black font-display font-bold uppercase tracking-wider px-8 py-4 border-2 border-brand-black shadow-brutal hover:translate-y-1 hover:shadow-brutal-hover transition-all text-lg">
+                        Actions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Actions Section -->
+    <section id="actions" class="py-20 bg-brand-cream border-b-4 border-brand-black relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center gap-4 mb-16">
+                <h2 class="text-4xl md:text-6xl font-display font-bold uppercase tracking-tight text-brand-black inline-block bg-[#f9c041] px-4 py-1 border-4 border-brand-black shadow-brutal">
+                    Upcoming and Past Actions
+                </h2>
+                <div class="h-2 flex-grow bg-brand-black hidden lg:block"></div>
+            </div>
+
+            <!-- Featured Upcoming Action: May Day 2026 -->
+            <div class="mb-20">
+                <div class="bg-white border-4 border-brand-black shadow-brutal flex flex-col lg:flex-row overflow-hidden">
+                    <!-- Poster Image (Hover to flip) -->
+                    <div class="w-full lg:w-1/2 border-b-4 lg:border-b-0 lg:border-r-4 border-brand-black bg-brand-cream relative group cursor-pointer" tabindex="0">
+                        <!-- Front Image -->
+                        <img src="may-day-front.jpg" 
+                             onerror="this.src='https://placehold.co/800x1000/f4f4f0/111111?text=May+Day+2026+Front'" 
+                             alt="Hands Off Higher Ed - May Day 2026 Front" 
+                             class="w-full h-full object-cover absolute inset-0 z-10 transition-opacity duration-500 ease-in-out group-hover:opacity-0 group-focus:opacity-0">
+                        <!-- Back Image -->
+                        <img src="may-day-back.jpg" 
+                             onerror="this.src='https://placehold.co/800x1000/f4f4f0/111111?text=May+Day+2026+Back'" 
+                             alt="Hands Off Higher Ed - May Day 2026 Back" 
+                             class="w-full h-full object-cover relative z-0">
+                    </div>
+                    
+                    <!-- Event Details -->
+                    <div class="w-full lg:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                        <div class="inline-block bg-brand-black text-white font-display font-bold uppercase px-4 py-2 mb-6 border-2 border-brand-black w-max text-xl">
+                            May Day 2026
+                        </div>
+                        <h3 class="text-5xl md:text-6xl font-display font-bold uppercase tracking-tighter leading-tight mb-4">
+                            Hands Off <br><span class="text-brand-red">Higher Ed</span>
+                        </h3>
+                        <p class="text-2xl font-bold font-display uppercase tracking-widest border-b-4 border-brand-black pb-4 mb-8">Friday, May 1</p>
+                        
+                        <ul class="space-y-6 text-lg font-medium mb-10">
+                            <li class="flex items-start">
+                                <span class="mr-4 text-brand-red">
+                                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                                </span>
+                                <div>
+                                    <strong class="block text-xl font-display uppercase tracking-wider text-brand-black">3:00 PM - The New School</strong>
+                                    <span class="text-gray-600">University Center, 63 5th Ave</span>
+                                    <p class="mt-1">Rally to defend higher ed jobs and build union power.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="mr-4 text-brand-red">
+                                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                                </span>
+                                <div>
+                                    <strong class="block text-xl font-display uppercase tracking-wider text-brand-black">4:00 PM - Washington Sq Park</strong>
+                                    <span class="text-gray-600">Garibaldi Statue</span>
+                                    <p class="mt-1">Join other unions and groups.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="mr-4 text-brand-red">
+                                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                                </span>
+                                <div>
+                                    <strong class="block text-xl font-display uppercase tracking-wider text-brand-black">5:15 PM - March to Foley Sq</strong>
+                                    <span class="text-gray-600">Centre St and Worth St</span>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="mt-auto pt-8 border-t-4 border-brand-black">
+                            <p class="font-display text-xl font-bold uppercase tracking-wider text-center">More info at <a href="https://labor4highered.org" target="_blank" rel="noopener noreferrer" class="text-brand-red hover:underline decoration-4 underline-offset-4">labor4highered.org</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Past Actions Grid -->
+            <div>
+                <h3 class="text-3xl font-display font-bold uppercase mb-8 inline-block border-b-4 border-brand-red pb-1">Past Actions Archive</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    
+                    <!-- Action 1 -->
+                    <div class="bg-white border-4 border-brand-black shadow-brutal flex flex-col h-full">
+                        <div class="border-b-4 border-brand-black relative aspect-[3/4] bg-white">
+                            <img src="4_17 Poster.png" 
+                                 onerror="this.src='https://placehold.co/600x800/eeeeee/999999?text=April+17+Poster'" 
+                                 alt="Rally for the Right to Learn" 
+                                 class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-2xl font-display font-bold uppercase mb-2 leading-tight">Rally for the Right to Learn!</h3>
+                            <p class="text-brand-black font-medium mb-4 flex-grow">March from Washington Square Park and rally at Foley Square to defend academic freedom.</p>
+                            
+                            <div class="mt-auto pt-4 border-t-2 border-brand-black border-dashed flex items-center justify-between flex-wrap gap-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-600">Press:</span>
+                                <div class="flex gap-2">
+                                    <a href="https://ny1.com/nyc/manhattan/politics/2025/04/18/protesters-rally-against-federal-government-policy-demands-for-schools" target="_blank" rel="noopener noreferrer" title="Read on NY1" class="flex items-center justify-center bg-[#1e488d] text-white font-sans font-bold text-[11px] px-2 py-1 border border-brand-black hover:bg-blue-800 transition-colors shadow-[2px_2px_0_0_#111] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#111]">
+                                        NY1
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action 2 -->
+                    <div class="bg-white border-4 border-brand-black shadow-brutal flex flex-col h-full">
+                        <div class="border-b-4 border-brand-black relative aspect-[3/4] bg-white">
+                            <img src="Apollo Management Poster.png" 
+                                 onerror="this.src='https://placehold.co/600x800/eeeeee/999999?text=Apollo+Poster'" 
+                                 alt="Hands Off Higher Ed - Apollo Management" 
+                                 class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-2xl font-display font-bold uppercase mb-2 leading-tight">Hands Off Higher Ed</h3>
+                            <p class="text-brand-black font-medium mb-4 flex-grow">Protest outside Apollo Global Management. Reject the Compact and oligarchic influence.</p>
+                            
+                            <div class="mt-auto pt-4 border-t-2 border-brand-black border-dashed flex items-center justify-between flex-wrap gap-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-600">Press:</span>
+                                <div class="flex gap-2 flex-wrap">
+                                    <a href="https://nypost.com/2025/11/06/business/apollo-tells-nyc-workers-to-stay-home-as-it-braces-for-protest-over-marc-rowans-trump-support/" target="_blank" rel="noopener noreferrer" title="Read on NY Post" class="flex items-center justify-center bg-[#cc0000] text-white font-serif font-black italic text-[11px] px-2 py-1 border border-brand-black hover:bg-red-800 transition-colors shadow-[2px_2px_0_0_#111] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#111]">
+                                        NY POST
+                                    </a>
+                                    <a href="https://nyunews.com/news/2025/11/10/aaup-protest-trump-compact-plan/" target="_blank" rel="noopener noreferrer" title="Read on NYU News" class="flex items-center justify-center bg-[#57068c] text-white font-sans font-bold text-[11px] px-2 py-1 border border-brand-black hover:bg-purple-900 transition-colors shadow-[2px_2px_0_0_#111] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#111]">
+                                        NYU NEWS
+                                    </a>
+                                    <a href="https://thefordhamram.com/news/aaup-protests-against-trump-admins-higher-ed-compact/" target="_blank" rel="noopener noreferrer" title="Read on Fordham Ram" class="flex items-center justify-center bg-[#860038] text-white font-sans font-bold text-[11px] px-2 py-1 border border-brand-black hover:bg-[#5e0027] transition-colors shadow-[2px_2px_0_0_#111] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#111]">
+                                        FORDHAM RAM
+                                    </a>
+                                    <a href="https://www.nytimes.com/2025/11/24/us/billionaires-influence-universities-trump.html" target="_blank" rel="noopener noreferrer" title="Read on NY Times" class="flex items-center justify-center bg-black text-white font-serif font-bold italic text-[11px] px-2 py-1 border border-brand-black hover:bg-gray-800 transition-colors shadow-[2px_2px_0_0_#111] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#111]">
+                                        NY TIMES
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action 3 -->
+                    <div class="bg-white border-4 border-brand-black shadow-brutal flex flex-col h-full">
+                        <div class="border-b-4 border-brand-black relative aspect-[3/4] bg-white">
+                            <img src="Townhall Poster.JPG" 
+                                 onerror="this.src='https://placehold.co/600x800/eeeeee/999999?text=Townhall+Poster'" 
+                                 alt="Town Hall Organizing Meeting" 
+                                 class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-2xl font-display font-bold uppercase mb-2 leading-tight">Organizing Town Hall</h3>
+                            <p class="text-brand-black font-medium flex-grow">Cross-institutional organizing meeting at the NYU Cantor Center to build power.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Who We Are Section -->
+    <section id="who-we-are" class="py-20 bg-brand-cream border-b-4 border-brand-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-6xl font-display font-bold uppercase tracking-tight inline-block border-b-8 border-brand-red pb-2">Who We Are</h2>
+                <p class="mt-6 text-xl font-medium max-w-3xl mx-auto">The NY Metro Coalition for Higher Ed comprises faculty, staff, and graduate worker unions, as well as advocacy groups from across the city and state.</p>
+            </div>
+
+            <!-- Participant Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 lg:gap-8">
+                
+                <img src="01psa-njit.png" onerror="this.outerHTML='<div class=\'logo-fallback\'>PSA<br>(NJIT AAUP)</div>'" alt="PSA NJIT Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                <img src="02aaup-st-johns.jpeg" onerror="this.outerHTML='<div class=\'logo-fallback\'>AAUP<br>St. John\'s</div>'" alt="AAUP St. Johns Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                <img src="03PSC-CUNY.png" onerror="this.outerHTML='<div class=\'logo-fallback\'>PSC<br>CUNY</div>'" alt="PSC CUNY Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                <img src="04aaup_tns.webp" onerror="this.outerHTML='<div class=\'logo-fallback\'>AAUP<br>The New School</div>'" alt="AAUP The New School Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                <img src="05SVA-fac.png" onerror="this.outerHTML='<div class=\'logo-fallback\'>SVA<br>Faculty United</div>'" alt="SVA Faculty United Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                
+                <img src="06swc-2710.jpg" onerror="this.outerHTML='<div class=\'logo-fallback\'>SWC<br>UAW Local 2710</div>'" alt="SWC UAW Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                <img src="07nyu-aaup.png" onerror="this.outerHTML='<div class=\'logo-fallback\'>AAUP<br>NYU</div>'" alt="AAUP NYU Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                <img src="08columbia-aaup.png" onerror="this.outerHTML='<div class=\'logo-fallback\'>Columbia<br>AAUP</div>'" alt="Columbia AAUP Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                <img src="09tns-academic.png" onerror="this.outerHTML='<div class=\'logo-fallback\'>Academic<br>Student Workers</div>'" alt="Academic Student Workers Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                <img src="010uaw-7902.jpg" onerror="this.outerHTML='<div class=\'logo-fallback\'>UAW<br>7902</div>'" alt="UAW 7902 Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                
+                <img src="011gsoc-uaw.png" onerror="this.outerHTML='<div class=\'logo-fallback\'>GSOC<br>UAW</div>'" alt="GSOC UAW Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                <img src="012act-uaw 7902.webp" onerror="this.outerHTML='<div class=\'logo-fallback\'>NYU Adjuncts<br>ACT-UAW 7902</div>'" alt="NYU Adjuncts Union Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                <img src="013Contract Faculty CFU UAW.png" onerror="this.outerHTML='<div class=\'logo-fallback\'>Contract Faculty<br>CFU UAW</div>'" alt="Contract Faculty United Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                <!-- Rutgers logo adjusted to display larger (reduced padding from p-4 to p-1) -->
+                <img src="014rutgers-aaup-aft.webp" onerror="this.outerHTML='<div class=\'logo-fallback\'>Rutgers<br>AAUP-AFT</div>'" alt="Rutgers AAUP-AFT Logo" class="w-full h-auto aspect-square object-contain p-1 bg-white border-4 border-brand-black shadow-brutal">
+                <!-- Added Hofstra AAUP placeholder -->
+                <img src="hofstra-aaup.png" onerror="this.outerHTML='<div class=\'logo-fallback\'>Hofstra<br>AAUP</div>'" alt="Hofstra AAUP Logo" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal">
+                
+                <img src="NY Metro CHE Logo.jpg" onerror="this.outerHTML='<div class=\'logo-fallback\'>More<br>Joining Soon</div>'" alt="Placeholder" class="w-full h-auto aspect-square object-contain p-4 bg-white border-4 border-brand-black shadow-brutal opacity-50 grayscale">
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission Statement Section -->
+    <section id="mission" class="py-24 bg-white border-b-4 border-brand-black relative">
+        <!-- Background Grid Pattern -->
+        <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px); background-size: 40px 40px;"></div>
+        
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-6xl font-display font-bold uppercase tracking-tight inline-block bg-brand-black text-white px-6 py-2 transform -skew-x-3 shadow-brutal-light">Mission Statement</h2>
+            </div>
+            
+            <div class="text-xl leading-relaxed space-y-8 font-medium text-gray-800">
+                <p>
+                    The NY Metro Coalition for Higher Ed is a group of faculty and staff unions and advocacy groups committed to advancing the right to learn, teach, research, associate, assemble, and dissent. We champion and defend the rights to academic freedom and freedom of speech as the cornerstone of higher education, crucial to the role of education in a just, democratic society. We stand against threats to ourselves and our educational institutions, which undermine or punish us for political speech, discriminate against us or harm us based on our identities or citizenship status, diminish our scientific, social, humanistic, and artistic research, or attack our rights.
+                </p>
+                <p>
+                    We believe in the necessity for greater economic equity within and across our institutions, and uphold a vision of higher education in which the pursuit of learning does not incur crippling debt. We are an advocacy network that shares resources and support through events and other platforms. We aim to enact changes within our institutions and at local and state levels that enshrine our rights, and pressure our institutional leaders to defend the autonomy of higher education.
+                </p>
+                <p>
+                    We aim to defend higher education from an unprecedented wave of authoritarian assault. Deadly cuts to scientific research, racist anti-DEI policies, attacks on trans people, and the abductions of pro-Palestinian student protestors do not merely target individual institutions. They threaten our whole sector. They affect large research universities and small teaching colleges alike; four- as well as two-year schools; public as well as private institutions. They take aim not only at isolated issues, but censor teaching and threaten research across all disciplines, obstructing learning in the laboratory and the classroom. They undermine faculty governance and academic freedom for tenured, contingent, and contract faculty, as well as citizen and noncitizen colleagues and students.
+                </p>
+                <p>
+                    To defeat this broadside against our sector requires unity and action by all who work and study on our campuses. The NY Metro area is home to one of the largest and most diverse higher education labor ecosystems in the country. We represent tens of thousands of educators and workers, and we teach hundreds of thousands of students from all over the world. The current administration has tried to bring the force of the federal government to bear on the most fundamental aspects of higher education, but they have moved quickly and recklessly. We have great strength in our numbers and our ability to act collectively. When we come together our power as workers and educators is greater than theirs.
+                </p>
+                
+                <!-- Highlighted Final Paragraph -->
+                <div class="mt-12 bg-brand-red text-white p-8 md:p-12 border-4 border-brand-black shadow-brutal">
+                    <p class="font-display text-2xl md:text-3xl uppercase leading-tight tracking-wide text-center m-0 shadow-none text-white">
+                        Our communities flourish when our universities thrive. We come together to build a future for higher education free from coercion, censorship, propaganda, transphobia, racism, and anti-immigrant hate. We are taking the fight to the State House, the White House, the boardroom, and the streets. We stand up for each other— because when we fight together, we win.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer / Get Involved -->
+    <footer id="get-involved" class="bg-brand-black text-white py-20 border-t-8 border-brand-red relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-4 text-center relative z-10">
+            <h2 class="text-6xl font-display font-bold uppercase tracking-tighter mb-6 text-white" style="text-shadow: 4px 4px 0 #2d6a4f;">
+                Join The Fight
+            </h2>
+            <p class="text-xl font-medium mb-10 max-w-2xl mx-auto">
+                When we come together, our power as workers and educators is greater than theirs. Organize with us.
+            </p>
+            <a href="mailto:contact@nymetrocoalition.example.org" class="inline-block bg-brand-red text-white font-display font-bold text-2xl uppercase px-12 py-4 border-4 border-white hover:bg-white hover:text-brand-red hover:-translate-y-1 transition-all shadow-[8px_8px_0_0_#2d6a4f] hover:shadow-[4px_4px_0_0_#2d6a4f]">
+                Email Us Now
+            </a>
+            <div class="mt-20 pt-8 border-t-2 border-gray-800 font-display uppercase tracking-widest text-sm text-gray-400">
+                &copy; 2026 NY Metro Coalition for Higher Education. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script>
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

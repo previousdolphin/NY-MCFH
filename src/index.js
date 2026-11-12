@@ -191,7 +191,13 @@ export default {
     }
   },
 
-  async scheduled(event, env, ctx) {
-    ctx.waitUntil(C.promoteDue(env.DB, Date.now()).then((r) => { if (r.length) console.log("promoted", JSON.stringify(r)); }));
+  async scheduled(event, env) {
+    try {
+      const r = await C.promoteDue(env.DB, Date.now());
+      if (r.length) console.log("scheduled publish", JSON.stringify(r));
+    } catch (e) {
+      console.error("scheduled publish failed", e && e.stack ? e.stack : e);
+      throw e;
+    }
   },
 };

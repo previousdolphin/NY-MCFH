@@ -4,8 +4,15 @@
   "main": "src/index.js",
   "compatibility_date": "2026-05-01",
   "workers_dev": false,
+  // Local dev answers as localhost, not as the staging route, so the dev sign-in bypass applies.
+  "dev": { "port": 8794, "host": "localhost:8794", "local_protocol": "http", "upstream_protocol": "http" },
   "preview_urls": false,
   "observability": { "enabled": true },
+
+  // Staging hostname. The live domain is added as a route at cutover (see docs/runbook.md).
+  "routes": [
+    { "pattern": "staging.nymetrocoalition.org", "custom_domain": true }
+  ],
 
   // The Worker renders every page. Only /static/* is served without running it.
   "assets": {

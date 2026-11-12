@@ -13,7 +13,8 @@ The yellow bar at the top always tells you how many unpublished changes are wait
 1. **Events**, then **Add event**.
 2. Fill in the title, start and end (New York time), venue and description. Choose a poster.
 3. **Save to draft**.
-4. **Publish**, then **Open preview** to see the whole site with your change.
+4. Press **Review and publish** in the bar at the top. The Publish page walks through three
+   steps: review what will change, open the preview, then put it live.
 5. Tick "I have checked the preview" and press **Publish now**.
 
 When the event's end time passes it moves to Past Actions by itself. Later you can open it
@@ -43,8 +44,8 @@ In longer text, leave a blank line between paragraphs. `**bold**`, `*italic*` an
 
 - **Before publishing:** **Discard changes** on the Publish page throws away everything
   unpublished.
-- **After publishing:** under **History**, tick the box on an older version and press
-  **Restore this version**. The live site goes back to it straight away. Your draft is left
+- **After publishing:** open **History**, press **Restore…** on an older version, tick the
+  box and press **Restore this version**. The live site goes back to it straight away. Your draft is left
   alone, so fix it or discard it before you publish again.
 
 ## If something looks wrong

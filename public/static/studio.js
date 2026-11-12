@@ -101,6 +101,15 @@
     return h('div', { class: 'st-gate' }, h('label', { class: 'st-check', for: id }, box, h('span', { text: checkLabel })), btn);
   }
 
+  function disclose(label, cls, content) {
+    var panel = h('div', { class: 'st-panel', hidden: true }, content);
+    var btn = h('button', { type: 'button', class: cls, 'aria-expanded': 'false', text: label, onclick: function () {
+      panel.hidden = !panel.hidden;
+      btn.setAttribute('aria-expanded', String(!panel.hidden));
+    } });
+    return h('div', { class: 'st-disclose' }, btn, panel);
+  }
+
   // ---------- form fields ----------
   function field(label, name, value, o) {
     o = o || {};
@@ -273,7 +282,7 @@
       });
     });
   }
-  function uploadButton(done) {
+  function uploadButton(done, primary) {
     var input = h('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp,image/gif', multiple: true, class: 'st-file', id: 'up' + Math.random().toString(36).slice(2) });
     var status = h('span', { class: 'st-hint', role: 'status' });
     input.addEventListener('change', function () {
@@ -289,8 +298,8 @@
         if (done) done(last);
       }).catch(function (e) { status.textContent = ''; input.value = ''; toast(e.message, true); });
     });
-    return h('div', { class: 'st-upload' }, h('label', { class: 'st-btn', for: input.id, text: 'Upload image…' }), input, status,
-      h('p', { class: 'st-hint', text: 'JPEG, PNG, WebP or GIF, up to 5 MB. Large images are resized before upload.' }));
+    return h('div', { class: 'st-upload' }, h('label', { class: 'st-btn' + (primary ? ' st-btn--primary' : ''), for: input.id, text: 'Upload image…' }), input, status,
+      primary ? null : h('p', { class: 'st-hint', text: 'JPEG, PNG, WebP or GIF, up to 5 MB. Large images are resized before upload.' }));
   }
 
   // ---------- views ----------
@@ -322,14 +331,14 @@
             !e.visible ? tag('Hidden') : null,
             ch['event:' + e.id] ? tag('Not published yet', 'st-tag--warn') : null,
             isPast(e) && !e.blurb && !(e.press || []).length ? tag('Add a summary and press links') : null)),
-        h('a', { class: 'st-btn', href: '#events/' + e.id, text: 'Edit' }));
+        h('a', { class: 'st-btn st-btn--sm', href: '#events/' + e.id, text: 'Edit' }));
     }
     function list(title, items, empty) {
-      return [h('h3', { text: title }), items.length ? h('ul', { class: 'st-list' }, items.map(row)) : h('p', { class: 'st-empty', text: empty })];
+      return [h('p', { class: 'st-sub', text: title }), items.length ? h('ul', { class: 'st-list' }, items.map(row)) : h('p', { class: 'st-empty', text: empty })];
     }
     return [
       h('div', { class: 'st-head' }, h('h2', { text: 'Events' }), h('a', { class: 'st-btn st-btn--primary', href: '#events/new', text: 'Add event' })),
-      h('p', { class: 'st-hint', text: 'Upcoming events are featured at the top of the home page. Once an event ends it moves to Past Actions on its own.' }),
+      h('p', { class: 'st-lede', text: 'Upcoming events are featured at the top of the home page. Once an event ends it moves to Past Actions on its own.' }),
       list('Upcoming', up, 'No upcoming events. Add one and it will be featured on the home page.'),
       list('Past', past, 'Past events appear here after they end.'),
     ];
@@ -390,14 +399,14 @@
           h('a', { class: 'st-item-title', href: '#' + plural + '/' + m.id, text: m.name }),
           h('p', { class: 'st-tags' }, !m.visible ? tag('Hidden') : null, ch[kind + ':' + m.id] ? tag('Not published yet', 'st-tag--warn') : null)),
         h('div', { class: 'st-row' },
-          h('button', { type: 'button', class: 'st-btn st-btn--quiet', 'aria-label': 'Move ' + m.name + ' up', text: '↑', disabled: i === 0, onclick: function () { move(i, -1); } }),
-          h('button', { type: 'button', class: 'st-btn st-btn--quiet', 'aria-label': 'Move ' + m.name + ' down', text: '↓', disabled: i === items.length - 1, onclick: function () { move(i, 1); } }),
-          h('a', { class: 'st-btn', href: '#' + plural + '/' + m.id, text: 'Edit' })));
+          h('button', { type: 'button', class: 'st-btn st-btn--sm', 'aria-label': 'Move ' + m.name + ' up', text: '↑', disabled: i === 0, onclick: function () { move(i, -1); } }),
+          h('button', { type: 'button', class: 'st-btn st-btn--sm', 'aria-label': 'Move ' + m.name + ' down', text: '↓', disabled: i === items.length - 1, onclick: function () { move(i, 1); } }),
+          h('a', { class: 'st-btn st-btn--sm', href: '#' + plural + '/' + m.id, text: 'Edit' })));
     }));
     return [
       h('div', { class: 'st-head' }, h('h2', { text: kind === 'member' ? 'Members' : 'Partners' }),
         h('a', { class: 'st-btn st-btn--primary', href: '#' + plural + '/new', text: kind === 'member' ? 'Add member' : 'Add partner' })),
-      h('p', { class: 'st-hint', text: kind === 'member'
+      h('p', { class: 'st-lede', text: kind === 'member'
         ? 'The organisations in the coalition. Their logos fill the Who We Are grid on the home page, in this order.'
         : 'Allied organisations shown as cards on the Partner Organizations page, in this order.' }),
       items.length ? list : h('p', { class: 'st-empty', text: 'Nothing here yet.' }),
@@ -460,161 +469,242 @@
     return page;
   }
 
+  var described = {}; // images whose description is read out on the site (posters, photos)
   function usage() {
     var u = {};
+    described = {};
     function note(k, where) { if (k) (u[k] = u[k] || []).push(where); }
-    S.draft.events.forEach(function (e) { note(e.poster, eventTitle(e)); note(e.poster_back, eventTitle(e)); });
+    S.draft.events.forEach(function (e) { note(e.poster, eventTitle(e)); note(e.poster_back, eventTitle(e)); described[e.poster] = described[e.poster_back] = true; });
     S.draft.members.forEach(function (m) { note(m.logo, m.name); });
     S.draft.partners.forEach(function (m) { note(m.logo, m.name); });
     var b = S.draft.blocks || {};
-    note(b.mission_photo, 'Mission photo'); note(b.logo_small, 'Small logo'); note(b.logo_large, 'Large logo'); note(b.share_image, 'Share image');
+    note(b.mission_photo, 'Mission photo'); described[b.mission_photo] = true; note(b.logo_small, 'Small logo'); note(b.logo_large, 'Large logo'); note(b.share_image, 'Share image');
     return u;
   }
   function viewImages() {
     var u = usage();
     var showHidden = sessionGet('showHidden') === '1';
     var list = S.media.filter(function (m) { return showHidden || !m.archived_at; });
-    var grid = h('ul', { class: 'st-media' }, list.map(function (m) {
-      var alt = h('input', { type: 'text', value: m.alt || '', maxlength: 300, id: 'alt-' + m.key.slice(0, 12), placeholder: 'What the image shows' });
-      var save = h('button', { type: 'button', class: 'st-btn', text: 'Save description', onclick: function () {
-        api('PATCH', 'media/' + m.key, { alt: alt.value }).then(refresh).then(function () { toast('Description saved to draft.'); renderChrome(); }).catch(function (e) { toast(e.message, true); });
-      } });
-      var used = u[m.key];
-      return h('li', { class: 'st-media-item' },
-        h('div', { class: 'st-thumb' }, h('img', { src: img(m.key), alt: m.alt || '', loading: 'lazy' })),
-        h('div', { class: 'st-media-body' },
-          h('p', { class: 'st-hint st-clip', text: m.filename || m.key.slice(0, 16) }),
-          h('p', { class: 'st-hint', text: used ? 'Used by: ' + used.slice(0, 3).join(', ') + (used.length > 3 ? ' and ' + (used.length - 3) + ' more' : '') : 'Not used in the draft' }),
-          h('label', { for: alt.id, text: 'Description for screen readers' }), alt,
-          h('div', { class: 'st-row' }, save,
-            h('button', { type: 'button', class: 'st-btn st-btn--quiet', text: m.archived_at ? 'Put back in library' : 'Hide from library', onclick: function () {
-              api('PATCH', 'media/' + m.key, { archived: !m.archived_at }).then(refresh).then(route).catch(function (e) { toast(e.message, true); });
-            } }))));
-    }));
     var hiddenCount = S.media.filter(function (m) { return m.archived_at; }).length;
+    var grid = h('ul', { class: 'st-tiles' }, list.map(function (m) {
+      var used = u[m.key];
+      return h('li', null, h('button', { type: 'button', class: 'st-tile' + (m.archived_at ? ' st-tile--hidden' : ''), onclick: function () { imageDetail(m, used); } },
+        h('div', { class: 'st-tile-img' }, h('img', { src: img(m.key), alt: m.alt || m.filename || 'Image', loading: 'lazy' })),
+        h('div', { class: 'st-tile-body' },
+          h('p', { class: 'st-tile-name st-clip', text: m.filename || 'Image' }),
+          h('p', { class: 'st-tile-meta st-clip', text: m.archived_at ? 'Hidden' : used ? 'Used by ' + used[0] + (used.length > 1 ? ' +' + (used.length - 1) : '') : 'Not used' }),
+          !m.alt && described[m.key] ? h('p', { class: 'st-tags' }, tag('Needs a description', 'st-tag--warn')) : null)));
+    }));
     return [
-      h('div', { class: 'st-head' }, h('h2', { text: 'Images' })),
-      h('p', { class: 'st-hint', text: 'Every poster, logo and photo on the site. Images are never deleted, so older versions of the site keep working. Hiding one only removes it from this list and the image chooser.' }),
-      uploadButton(function () { route(); }),
-      hiddenCount ? h('p', null, h('button', { type: 'button', class: 'st-btn st-btn--quiet', text: showHidden ? 'Stop showing hidden images' : 'Show ' + hiddenCount + ' hidden', onclick: function () { sessionSet('showHidden', showHidden ? '0' : '1'); route(); } })) : null,
+      h('div', { class: 'st-head' }, h('h2', { text: 'Images' }), uploadButton(function () { route(); }, true)),
+      h('p', { class: 'st-lede', text: 'Every poster, logo and photo on the site. Select an image to describe it or hide it. To put an image on the site, choose it from the event, member, partner or page text you are editing. Uploads can be JPEG, PNG, WebP or GIF, up to 5 MB.' }),
       list.length ? grid : h('p', { class: 'st-empty', text: 'No images yet. Upload a poster or logo to start.' }),
+      hiddenCount ? h('p', null, h('button', { type: 'button', class: 'st-btn st-btn--quiet', text: showHidden ? 'Stop showing hidden images' : 'Show ' + hiddenCount + ' hidden', onclick: function () { sessionSet('showHidden', showHidden ? '0' : '1'); route(); } })) : null,
     ];
+  }
+
+  function imageDetail(m, used) {
+    var dlg = h('dialog', { class: 'st-dialog', 'aria-label': 'Image details' });
+    var alt = h('textarea', { id: 'img-alt', rows: 3, maxlength: 300, placeholder: 'For example: Poster for the November 16 forum at NYU' });
+    alt.value = m.alt || '';
+    var msg = h('p', { class: 'st-formmsg', role: 'alert' });
+    function done(text) { dlg.close(); refresh().then(function () { toast(text); route(); }); }
+    function fail(e) { msg.textContent = e.message; }
+    add(dlg, [
+      h('div', { class: 'st-dialog-head' }, h('h2', { class: 'st-clip', text: m.filename || 'Image' }),
+        h('button', { type: 'button', class: 'st-btn st-btn--quiet', text: 'Close', onclick: function () { dlg.close(); } })),
+      h('div', { class: 'st-detail' },
+        h('div', { class: 'st-detail-img' }, h('img', { src: img(m.key), alt: m.alt || '' })),
+        h('div', null,
+          h('p', { class: 'st-hint', text: (m.width && m.height ? m.width + ' × ' + m.height + ' px · ' : '') + Math.max(1, Math.round(m.bytes / 1024)) + ' KB' }),
+          h('p', { class: 'st-hint', text: used ? 'Used by: ' + used.join(', ') : 'Not used anywhere in the draft.' }),
+          h('div', { class: 'st-field' }, h('label', { for: 'img-alt', text: 'Description' }), alt,
+            h('p', { class: 'st-hint', text: 'Read aloud to visitors who cannot see the image. Say what it shows in a sentence.' })),
+          h('div', { class: 'st-row' },
+            h('button', { type: 'button', class: 'st-btn st-btn--primary', text: 'Save description', onclick: function () {
+              api('PATCH', 'media/' + m.key, { alt: alt.value }).then(function () { done('Description saved to draft.'); }).catch(fail);
+            } }),
+            h('button', { type: 'button', class: 'st-btn', text: m.archived_at ? 'Put back in library' : 'Hide from library', onclick: function () {
+              api('PATCH', 'media/' + m.key, { archived: !m.archived_at }).then(function () { done(m.archived_at ? 'Image is back in the library.' : 'Image hidden from the library.'); }).catch(fail);
+            } })),
+          msg,
+          h('p', { class: 'st-hint', text: 'Images are never deleted, so older versions of the site keep working. Hiding one only removes it from this page and the image chooser.' }))),
+    ]);
+    dlg.addEventListener('close', function () { dlg.remove(); });
+    document.body.appendChild(dlg);
+    dlg.showModal();
   }
   function sessionGet(k) { try { return sessionStorage.getItem('st-' + k); } catch (e) { return null; } }
   function sessionSet(k, v) { try { sessionStorage.setItem('st-' + k, v); } catch (e) {} }
 
-  var CHANGE_WORD = { added: 'Added', edited: 'Edited', removed: 'Removed', hidden: 'Hidden', shown: 'Shown again', reordered: 'Reordered' };
+  var CHANGE_WORD = { added: 'New', edited: 'Edited', removed: 'Removed', hidden: 'Hidden', shown: 'Shown again', reordered: 'Reordered' };
   var KIND_WORD = { event: 'Event', member: 'Member', partner: 'Partner', block: 'Page text', media: 'Images' };
-  function changeList(changes) {
+  function changeLink(c) {
+    if (c.change === 'removed') return null;
+    if (c.kind === 'event' && c.id) return '#events/' + c.id;
+    if (c.kind === 'member') return c.id ? '#members/' + c.id : '#members';
+    if (c.kind === 'partner') return c.id ? '#partners/' + c.id : '#partners';
+    if (c.kind === 'block') return '#text';
+    if (c.kind === 'media') return '#images';
+    return null;
+  }
+  function changeList(changes, links) {
     return h('ul', { class: 'st-changes' }, changes.map(function (c) {
-      return h('li', null, h('strong', { text: CHANGE_WORD[c.change] + ': ' }),
-        (c.change === 'reordered' ? '' : KIND_WORD[c.kind] + ' · ') + c.name + (c.hidden ? ' (hidden, will not appear)' : '') + (c.by ? ' (by ' + who(c.by) + ')' : ''));
+      var href = links ? changeLink(c) : null;
+      return h('li', null,
+        tag(CHANGE_WORD[c.change], c.change === 'removed' || c.change === 'hidden' ? '' : 'st-tag--warn'),
+        h('span', { class: 'st-grow' }, h('strong', { text: c.name }),
+          h('span', { class: 'st-hint', text: ' ' + (c.change === 'reordered' ? '' : KIND_WORD[c.kind]) + (c.hidden ? ' · hidden, will not appear' : '') + (c.by ? ' · by ' + who(c.by) : '') })),
+        href ? h('a', { href: href, text: 'Open' }) : null);
     }));
   }
   function previewUrl(scheduled) { return location.origin + '/preview/' + S.preview_token + (scheduled ? '/scheduled' : '') + '/'; }
+  function step(n, title, body) {
+    return h('section', { class: 'st-card st-step' }, h('div', { class: 'st-step-n', 'aria-hidden': 'true', text: String(n) }),
+      h('div', null, h('h3', { text: 'Step ' + n + ': ' + title }), body));
+  }
+  function retry409(e) {
+    if (e.status === 409) return refresh().then(function () { route(); toast(e.message, true); });
+    throw e;
+  }
 
   function viewPublish() {
-    var out = [h('div', { class: 'st-head' }, h('h2', { text: 'Publish' }))];
     var n = S.changes.length;
+    var out = [h('div', { class: 'st-head' }, h('h2', { text: 'Publish' }))];
+    out.push(h('p', { class: 'st-lede', text: 'What you save in the editor is a draft that only editors can see. Publishing puts the draft on the live site.' }));
 
-    // Pending schedule
     if (S.scheduled) {
       var sc = S.scheduled;
       out.push(h('section', { class: 'st-card st-card--note' },
-        h('h3', { text: 'Scheduled for ' + niceUtc(sc.publish_at) + ' (New York time)' }),
-        h('p', { text: 'Set up by ' + who(sc.by) + (sc.note ? '. Note: ' + sc.note : '.') + ' It will publish these changes:' }),
-        sc.changes.length ? changeList(sc.changes) : h('p', { class: 'st-hint', text: 'No difference from the live site.' }),
-        sc.draft_ahead ? h('p', { class: 'st-warn', text: 'The draft has been edited since this was scheduled. Those newer edits are not included. Schedule again to include them.' }) : null,
-        h('p', null, h('a', { href: previewUrl(true), target: '_blank', rel: 'noopener', text: 'Preview the scheduled version' })),
-        gate('Yes, cancel the schedule', 'Cancel schedule', '', function () {
-          return api('DELETE', 'schedule').then(refresh).then(function () { toast('Schedule cancelled. The draft is unchanged.'); route(); });
+        h('h3', { text: 'Scheduled to publish ' + niceUtc(sc.publish_at) + ' (New York time)' }),
+        h('p', { class: 'st-hint', text: 'Set up by ' + who(sc.by) + (sc.note ? ' · ' + sc.note : '') + '. It will make these changes:' }),
+        sc.changes.length ? changeList(sc.changes, false) : h('p', { class: 'st-hint', text: 'No difference from the live site.' }),
+        sc.draft_ahead ? h('p', { class: 'st-warn', text: 'You have edited the draft since scheduling. Those newer edits are not included. Schedule again below to include them.' }) : null,
+        h('p', { class: 'st-row' }, h('a', { class: 'st-btn st-btn--sm', href: previewUrl(true), target: '_blank', rel: 'noopener', text: 'Preview the scheduled version' })),
+        gate('Cancel this scheduled publish', 'Cancel schedule', '', function () {
+          return api('DELETE', 'schedule').then(refresh).then(function () { toast('Schedule cancelled. Your draft is unchanged.'); route(); });
         })));
     }
 
-    // What is waiting
-    out.push(h('section', { class: 'st-card' },
-      h('h3', { text: n ? (n === 1 ? '1 unpublished change' : n + ' unpublished changes') : 'Nothing to publish' }),
-      n ? changeList(S.changes) : h('p', { class: 'st-hint', text: S.live ? 'The draft matches the live site.' : 'Nothing has been published yet.' }),
+    if (!n) {
+      out.push(h('section', { class: 'st-card st-hero' }, h('div', { class: 'st-hero-icon', 'aria-hidden': 'true', text: '✓' }),
+        h('div', null, h('h3', { text: S.live ? 'The live site is up to date' : 'Nothing has been published yet' }),
+          h('p', { class: 'st-hint', text: S.live ? 'Everything in the editor is on the live site. Last published ' + niceUtc(S.live.published_at) + (S.live.by === 'seed' ? '' : ' by ' + who(S.live.by)) + '.' : 'Add some content, then come back here.' }),
+          h('p', { class: 'st-row' }, h('a', { class: 'st-btn', href: '/', target: '_blank', rel: 'noopener', text: 'View live site' }), h('a', { class: 'st-btn st-btn--quiet', href: '#history', text: 'See history' })))));
+      return out;
+    }
+
+    out.push(h('section', { class: 'st-card st-hero' }, h('div', { class: 'st-hero-icon st-hero-icon--warn', 'aria-hidden': 'true', text: String(n) }),
+      h('div', null, h('h3', { text: n === 1 ? '1 change is waiting to be published' : n + ' changes are waiting to be published' }),
+        h('p', { class: 'st-hint', text: 'Visitors still see the site as it was last published. Follow the three steps below to put your changes live.' }))));
+
+    out.push(step(1, 'Review what will change', [
+      h('p', { class: 'st-hint', text: 'Everything listed here goes live together. To hold something back, open it and untick "Show on site".' }),
+      changeList(S.changes, true)]));
+
+    out.push(step(2, 'Check the preview', [
+      h('p', { class: 'st-hint', text: 'The preview is the whole site with your draft applied. The link also works for people who are not editors, so you can send it to a colleague first.' }),
       h('p', { class: 'st-row' },
         h('a', { class: 'st-btn', href: previewUrl(false), target: '_blank', rel: 'noopener', text: 'Open preview' }),
         h('button', { type: 'button', class: 'st-btn st-btn--quiet', text: 'Copy preview link', onclick: function () {
           navigator.clipboard.writeText(previewUrl(false)).then(function () { toast('Preview link copied.'); }, function () { toast('Copy did not work. Open the preview and copy its address.', true); });
-        } })),
-      h('p', { class: 'st-hint', text: 'The preview shows the whole site with your draft applied. Anyone with the link can see it, so you can send it to colleagues before publishing.' })));
+        } }))]));
 
-    if (n) {
-      var note = h('input', { type: 'text', id: 'pub-note', maxlength: 300, placeholder: 'Optional, e.g. "Added the November forum"' });
-      var when = h('input', { type: 'datetime-local', id: 'pub-when', min: S.now_local });
-      out.push(h('section', { class: 'st-card' },
-        h('div', { class: 'st-field st-field--wide' }, h('label', { for: 'pub-note', text: 'Note for the history' }), note),
-        h('h3', { text: 'Publish now' }),
-        S.scheduled ? h('p', { class: 'st-warn', text: 'Publishing now cancels the scheduled publish above.' }) : null,
-        gate('I have checked the preview', 'Publish now', 'st-btn--primary', function () {
-          return api('POST', 'publish', { draft_rev: S.draft_rev, note: note.value }).then(refresh).then(function () { toast('Published. The live site is updated.'); route(); })
-            .catch(function (e) { if (e.status === 409) return refresh().then(function () { route(); toast(e.message, true); }); throw e; });
-        }),
-        h('h3', { text: 'Or schedule it' }),
-        h('div', { class: 'st-field' }, h('label', { for: 'pub-when', text: 'Publish at (New York time)' }), when),
-        h('p', { class: 'st-hint', text: 'The draft is frozen as it is now and goes live at that time. Edits you make afterwards are not included.' + (S.scheduled ? ' This replaces the current schedule.' : '') }),
-        gate('I have checked the preview', 'Schedule', '', function () {
-          if (!when.value) { toast('Choose a date and time first.', true); return; }
-          return api('POST', 'schedule', { draft_rev: S.draft_rev, note: note.value, publish_at: when.value.slice(0, 16) }).then(refresh).then(function () { toast('Scheduled.'); route(); })
-            .catch(function (e) { if (e.status === 409) return refresh().then(function () { route(); toast(e.message, true); }); throw e; });
-        })));
-      if (S.live) {
-        out.push(h('section', { class: 'st-card st-danger' }, h('h3', { text: 'Discard changes' }),
-          h('p', { class: 'st-hint', text: 'Throws away every unpublished change listed above. The draft goes back to matching the live site. This cannot be undone.' }),
+    var note = h('input', { type: 'text', id: 'pub-note', maxlength: 300, placeholder: 'For example: Added the November forum' });
+    var when = h('input', { type: 'datetime-local', id: 'pub-when', min: S.now_local });
+    var whenBox = h('div', { class: 'st-inset', hidden: true },
+      h('label', { for: 'pub-when', text: 'Date and time (New York time)' }), when,
+      h('p', { class: 'st-hint', text: 'The draft is frozen as it is right now and goes live at that time. Anything you edit afterwards is not included unless you schedule again.' + (S.scheduled ? ' This replaces the current schedule.' : '') }));
+    var rNow = h('input', { type: 'radio', name: 'pub-mode', id: 'pub-now', checked: true });
+    var rLater = h('input', { type: 'radio', name: 'pub-mode', id: 'pub-later' });
+    var go = gate('I have checked the preview', 'Publish now', 'st-btn--primary', function () {
+      if (rLater.checked) {
+        if (!when.value) { toast('Choose a date and time first.', true); return; }
+        return api('POST', 'schedule', { draft_rev: S.draft_rev, note: note.value, publish_at: when.value.slice(0, 16) })
+          .then(refresh).then(function () { toast('Scheduled. It will publish on its own.'); route(); }).catch(retry409);
+      }
+      return api('POST', 'publish', { draft_rev: S.draft_rev, note: note.value })
+        .then(refresh).then(function () { toast('Published. The live site is updated.'); route(); }).catch(retry409);
+    });
+    var goBtn = go.querySelector('button');
+    function mode() { whenBox.hidden = !rLater.checked; goBtn.textContent = rLater.checked ? 'Schedule publish' : 'Publish now'; }
+    rNow.addEventListener('change', mode); rLater.addEventListener('change', mode);
+    out.push(step(3, 'Put it live', [
+      h('div', { class: 'st-choice', role: 'radiogroup', 'aria-label': 'When to publish' },
+        h('label', { for: 'pub-now' }, rNow, h('div', null, h('span', { text: 'Publish now' }), h('small', { text: 'The live site updates within a minute.' + (S.scheduled ? ' This cancels the scheduled publish above.' : '') }))),
+        h('label', { for: 'pub-later' }, rLater, h('div', null, h('span', { text: 'Schedule for later' }), h('small', { text: 'Pick a date and time, for example to announce an event on Monday morning.' })))),
+      whenBox,
+      h('div', { class: 'st-field' }, h('label', { for: 'pub-note', text: 'Note for the history (optional)' }), note),
+      go]));
+
+    if (S.live) {
+      out.push(disclose('Discard all changes instead…', 'st-btn st-btn--quiet',
+        h('section', { class: 'st-danger' },
+          h('p', { text: 'This throws away every unpublished change listed in step 1. The draft goes back to matching the live site. It cannot be undone.' }),
           gate('Yes, discard all unpublished changes', 'Discard changes', 'st-btn--danger', function () {
             return api('POST', 'draft/reset', {}).then(refresh).then(function () { toast('Changes discarded.'); route(); });
-          })));
-      }
+          }))));
     }
-
-    // History
-    var hist = h('section', { class: 'st-card' }, h('h3', { text: 'History' }), h('p', { class: 'st-hint', text: 'Loading…' }));
-    out.push(hist);
-    api('GET', 'releases').then(function (r) {
-      clear(hist);
-      hist.appendChild(h('h3', { text: 'History' }));
-      var rows = r.releases.filter(function (v) { return v.status === 'published'; });
-      if (!rows.length) { hist.appendChild(h('p', { class: 'st-empty', text: 'Each time you publish, the version is kept here so you can go back to it.' })); return; }
-      hist.appendChild(h('p', { class: 'st-hint', text: 'Every published version. Restoring one makes it the live site again; your draft is left as it is.' }));
-      hist.appendChild(h('ul', { class: 'st-list' }, rows.map(function (v) {
-        var liveNow = S.live && v.id === S.live.id;
-        var li = h('li', { class: 'st-item st-item--col' },
-          h('div', { class: 'st-item-main' },
-            h('p', { class: 'st-item-title', text: niceUtc(v.published_at) }),
-            h('p', { class: 'st-hint', text: (v.rolled_back_from ? 'Restored by ' : v.publish_at ? 'Scheduled by ' : 'Published by ') + (v.created_by === 'seed' ? 'the site import' : who(v.created_by)) + (v.note ? ' · ' + v.note : '') }),
-            liveNow ? h('p', { class: 'st-tags' }, tag('Live now', 'st-tag--ok')) : null));
-        if (!liveNow) {
-          li.appendChild(gate('Make this version live again', 'Restore this version', '', function () {
-            return api('POST', 'releases/' + v.id + '/rollback', {}).then(refresh).then(function () { toast('Restored. That version is live again.'); route(); });
-          }));
-        }
-        return li;
-      })));
-    }).catch(function (e) { clear(hist); hist.appendChild(h('p', { class: 'st-warn', text: e.message })); });
     return out;
   }
 
+  function viewHistory() {
+    var box = h('div', null, h('p', { class: 'st-hint', text: 'Loading…' }));
+    api('GET', 'releases').then(function (r) {
+      clear(box);
+      var rows = r.releases.filter(function (v) { return v.status === 'published'; });
+      if (!rows.length) { box.appendChild(h('p', { class: 'st-empty', text: 'Each time you publish, that version of the site is kept here so you can go back to it.' })); return; }
+      box.appendChild(h('ul', { class: 'st-list' }, rows.map(function (v) {
+        var liveNow = S.live && v.id === S.live.id;
+        var by = v.created_by === 'seed' ? 'the original site import' : who(v.created_by);
+        return h('li', { class: 'st-item st-version' },
+          h('div', { class: 'st-item-main' },
+            h('p', { class: 'st-item-title', text: niceUtc(v.published_at) }),
+            h('p', { class: 'st-hint', text: (v.rolled_back_from ? 'Restored by ' : v.publish_at ? 'Scheduled by ' : 'Published by ') + by + (v.note ? ' · ' + v.note : '') })),
+          liveNow ? tag('Live now', 'st-tag--ok') : null,
+          liveNow ? null : disclose('Restore…', 'st-btn st-btn--sm', [
+            h('p', { class: 'st-hint', text: 'The live site goes back to exactly this version straight away. Your draft is not changed.' }),
+            gate('Make this version the live site', 'Restore this version', 'st-btn--primary', function () {
+              return api('POST', 'releases/' + v.id + '/rollback', {}).then(refresh).then(function () { toast('Restored. That version is live again.'); route(); });
+            })]));
+      })));
+    }).catch(function (e) { clear(box); box.appendChild(h('p', { class: 'st-warn', text: e.message })); });
+    return [
+      h('div', { class: 'st-head' }, h('h2', { text: 'History' })),
+      h('p', { class: 'st-lede', text: 'Every version of the site that has been published, newest first. If something goes out wrong, restore the version before it.' }),
+      box,
+    ];
+  }
+
   // ---------- chrome + routing ----------
-  var TABS = [['events', 'Events'], ['members', 'Members'], ['partners', 'Partners'], ['text', 'Page text'], ['images', 'Images'], ['publish', 'Publish']];
-  var main, nav, statusBar;
+  var NAV = [
+    ['Content', [['events', 'Events'], ['members', 'Members'], ['partners', 'Partners'], ['text', 'Page text'], ['images', 'Images']]],
+    ['Site', [['publish', 'Publish'], ['history', 'History']]],
+  ];
+  var main, nav, bar;
 
   function renderChrome() {
     var cur = (location.hash.slice(1) || 'events').split('/')[0];
-    clear(nav);
-    TABS.forEach(function (t) {
-      var a = h('a', { href: '#' + t[0], text: t[1], 'aria-current': cur === t[0] ? 'page' : null });
-      if (t[0] === 'publish' && S.changes.length) a.appendChild(h('span', { class: 'st-count', text: String(S.changes.length), 'aria-label': S.changes.length + ' unpublished' }));
-      nav.appendChild(a);
-    });
-    clear(statusBar);
     var n = S.changes.length;
-    statusBar.className = 'st-status' + (n ? ' st-status--pending' : '');
-    statusBar.appendChild(h('span', { text: n ? (n === 1 ? '1 unpublished change in the draft.' : n + ' unpublished changes in the draft.') : 'The draft matches the live site.' }));
-    if (S.scheduled) statusBar.appendChild(h('span', { text: ' A publish is scheduled for ' + niceUtc(S.scheduled.publish_at) + '.' }));
-    if (n && cur !== 'publish') statusBar.appendChild(h('a', { href: '#publish', text: 'Review and publish' }));
+    clear(nav);
+    NAV.forEach(function (group) {
+      nav.appendChild(h('span', { class: 'st-nav-label', text: group[0] }));
+      group[1].forEach(function (t) {
+        var a = h('a', { href: '#' + t[0], 'aria-current': cur === t[0] ? 'page' : null }, h('span', { text: t[1] }));
+        if (t[0] === 'publish' && n) a.appendChild(h('span', { class: 'st-count', text: String(n), 'aria-label': n + ' not published' }));
+        nav.appendChild(a);
+      });
+    });
+    clear(bar);
+    var sched = S.scheduled ? h('small', { text: 'Scheduled for ' + niceUtc(S.scheduled.publish_at) }) : null;
+    add(bar, [
+      h('div', { class: 'st-state', role: 'status' }, h('span', { class: 'st-dot' + (n ? ' st-dot--warn' : ''), 'aria-hidden': 'true' }),
+        h('span', { text: n ? (n === 1 ? '1 change not published yet' : n + ' changes not published yet') : 'Everything is published' }), sched),
+      h('div', { class: 'st-row' },
+        n ? h('a', { class: 'st-btn st-btn--sm', href: previewUrl(false), target: '_blank', rel: 'noopener', text: 'Preview' })
+          : h('a', { class: 'st-btn st-btn--sm', href: '/', target: '_blank', rel: 'noopener', text: 'View live site' }),
+        n && cur !== 'publish' ? h('a', { class: 'st-btn st-btn--sm st-btn--primary', href: '#publish', text: 'Review and publish' }) : null),
+    ]);
   }
 
   var lastHash = '';
@@ -634,6 +724,7 @@
     else if (p[0] === 'text') view = viewText();
     else if (p[0] === 'images') view = viewImages();
     else if (p[0] === 'publish') view = viewPublish();
+    else if (p[0] === 'history') view = viewHistory();
     else view = viewEvents();
     renderChrome();
     clear(main);
@@ -644,22 +735,22 @@
   function boot() {
     clear(app);
     nav = h('nav', { class: 'st-nav', 'aria-label': 'Sections' });
-    statusBar = h('div', { class: 'st-status', role: 'status' });
+    bar = h('header', { class: 'st-bar' });
     main = h('main', { class: 'st-main', id: 'main' });
-    add(app, [
-      h('header', { class: 'st-top' },
-        h('div', { class: 'st-top-row' },
-          h('h1', { text: 'Site editor' }),
-          h('p', { class: 'st-me' }, h('span', { text: S.me }), ' · ', h('a', { href: '/', target: '_blank', rel: 'noopener', text: 'View live site' }))),
-        nav),
-      h('div', { class: 'st-signin', id: 'st-signin', hidden: true, role: 'alert' },
-        h('span', { text: 'Your sign-in has expired. Nothing on this page is lost. ' }),
-        h('a', { href: '/studio', target: '_blank', rel: 'noopener', text: 'Sign in again' }),
-        h('span', { text: ' in a new tab, then come back here and continue. ' }),
-        h('button', { type: 'button', class: 'st-btn st-btn--quiet', text: 'Dismiss', onclick: function () { document.getElementById('st-signin').hidden = true; } })),
-      statusBar, main,
-      h('div', { class: 'st-toast', id: 'st-toast', role: 'status', 'aria-live': 'polite' }),
-    ]);
+    add(app, h('div', { class: 'st-app' },
+      h('aside', { class: 'st-side' },
+        h('div', { class: 'st-brand' }, h('img', { src: '/static/favicon.png', alt: '' }),
+          h('div', null, h('strong', { text: 'NY Metro Coalition' }), h('span', { text: 'Site editor' }))),
+        nav,
+        h('div', { class: 'st-side-foot' }, h('p', { text: 'Signed in as ' + S.me }), h('p', null, h('a', { href: '/', target: '_blank', rel: 'noopener', text: 'View live site' })))),
+      h('div', { class: 'st-body' },
+        bar,
+        h('div', { class: 'st-signin', id: 'st-signin', hidden: true, role: 'alert' },
+          h('span', { text: 'Your sign-in has expired. Nothing on this page is lost. ' }),
+          h('a', { href: '/studio', target: '_blank', rel: 'noopener', text: 'Sign in again' }),
+          h('span', { text: ' in a new tab, then come back here and continue.' })),
+        main)));
+    add(app, h('div', { class: 'st-toast', id: 'st-toast', role: 'status', 'aria-live': 'polite' }));
     window.addEventListener('hashchange', route);
     window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
     route();

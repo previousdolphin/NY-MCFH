@@ -1,0 +1,36 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ny-mcfh",
+  "main": "src/index.js",
+  "compatibility_date": "2026-05-01",
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+
+  // The Worker renders every page. Only /static/* is served without running it.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "not_found_handling": "none",
+    "run_worker_first": ["/*", "!/static/*"]
+  },
+
+  "d1_databases": [
+    { "binding": "DB", "database_name": "ny-mcfh-db", "database_id": "261597c6-682f-4783-8cd8-f085e13503c2", "migrations_dir": "migrations" }
+  ],
+  "r2_buckets": [
+    { "binding": "MEDIA", "bucket_name": "ny-mcfh-r2-media" }
+  ],
+
+  // Fires a scheduled publish when its time comes.
+  "triggers": { "crons": ["* * * * *"] },
+
+  "vars": {
+    "SITE_HOST": "nymetrocoalition.org",
+    "MEDIA_BASE": "/media",
+    // Set both once the Zero Trust application exists. Until then the editor refuses everyone.
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": ""
+  }
+}

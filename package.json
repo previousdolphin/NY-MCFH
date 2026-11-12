@@ -1,0 +1,15 @@
+{
+  "name": "ny-mcfh",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "node --no-warnings --test test/*.test.mjs",
+    "seed:local": "node scripts/seed.mjs --local",
+    "seed:remote": "node scripts/seed.mjs --remote",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "jose": "^5.9.6"
+  }
+}

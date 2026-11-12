@@ -9,9 +9,12 @@
   "preview_urls": false,
   "observability": { "enabled": true },
 
-  // Staging hostname. The live domain is added as a route at cutover (see docs/runbook.md).
+  // The live domain is a route in front of the existing DNS records (which still point at
+  // GitHub Pages). Removing the two nymetrocoalition.org routes puts the old static site back.
   "routes": [
-    { "pattern": "staging.nymetrocoalition.org", "custom_domain": true }
+    { "pattern": "staging.nymetrocoalition.org", "custom_domain": true },
+    { "pattern": "nymetrocoalition.org/*", "zone_name": "nymetrocoalition.org" },
+    { "pattern": "www.nymetrocoalition.org/*", "zone_name": "nymetrocoalition.org" }
   ],
 
   // The Worker renders every page. Only /static/* is served without running it.

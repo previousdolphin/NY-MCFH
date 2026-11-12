@@ -38,9 +38,9 @@
 
   "vars": {
     "SITE_HOST": "nymetrocoalition.org",
-    "MEDIA_BASE": "/media",
+    "MEDIA_BASE": "https://media.nymetrocoalition.org",
     // Set both once the Zero Trust application exists. Until then the editor refuses everyone.
-    "ACCESS_TEAM_DOMAIN": "",
-    "ACCESS_AUD": ""
+    "ACCESS_TEAM_DOMAIN": "unsubscribe.cloudflareaccess.com",
+    "ACCESS_AUD": "a518ba1f3bb946dfbd7a9a8298b1eb005dae7ea749d87f43bebd0ceaaab0dd3f"
   }
 }
